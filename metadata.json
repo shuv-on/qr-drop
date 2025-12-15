@@ -1,0 +1,14 @@
+{
+    "name": "QR Drop",
+    "description": "Generate QR code from clipboard",
+    "uuid": "qrdrop@shuvon.com",
+    "shell-version": [
+        "42",
+        "43",
+        "44",
+        "45",
+        "46",
+        "47"
+    ],
+    "url": "https://github.com/shuv-on/qr-drop"
+}
