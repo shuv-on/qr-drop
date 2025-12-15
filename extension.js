@@ -40,6 +40,22 @@ const QrIndicator =  GObject.registerClass(
             box.add_child(this._qrLabel);
 
             this.menu.box.add_child(box);
+
+            // Event listener for clipboard
+            this.menu.connect('open-state-changed', (menu, isOpen) =>{
+                if (isOpen){
+                    Clipboard.get_text(CLIPBOARD_TYPE, (Clipboard, text) =>{
+                        if (text){
+                            //  update label
+                            // Text slice
+                            let displayText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                            this._qrLabel.set_text(displayText);
+                        } else {
+                            this._qrLabel.set_text('Clipboard is empty(');
+                        }
+                    });
+                }
+            });
         }
     }
 );
