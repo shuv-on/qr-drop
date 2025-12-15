@@ -1,8 +1,12 @@
 import GObject from 'gi://GObject';
 import St from 'gi://St';
+import Clutter from 'gi://Clutter';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+
+const Clipboard = St.Clipboard.get_default();
+const CLIPBOARD_TYPE = St.ClipboardType.CLIPBOARD;
 
 //Class for Panel menu
 const QrIndicator =  GObject.registerClass(
@@ -19,6 +23,23 @@ const QrIndicator =  GObject.registerClass(
 
             // Add icon to panel
             this.add_child(icon);
+
+            // Create box
+            let box = new St.BoxLayout({
+                vertical: true,
+                style_class: 'qr-content-box',
+                x_expand: true,
+                y_expand: true
+            });
+
+            // Create label
+            this._qrLabel = new St.Label({
+                text: 'Waiting for clipboard boss...',
+                y_align: Clutter.ActorAlign.CENTER
+            });
+            box.add_child(this._qrLabel);
+
+            this.menu.box.add_child(box);
         }
     }
 );
