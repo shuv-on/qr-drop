@@ -1,6 +1,7 @@
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
+import Cairo from 'gi://cairo';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
@@ -32,6 +33,20 @@ const QrIndicator =  GObject.registerClass(
                 y_expand: true
             });
 
+
+            // Drawing Area
+            this._drawingArea = new St.DrawingArea({
+                style_class: 'qr-image',
+                width: 200,
+                height: 200,
+                x_align: Clutter.ActorAlign.CENTER
+            });
+
+            this._drawingArea.connect('repaint', (area) => {
+                this._drawQR(area);
+            });
+            box.add_child(this._drawingArea);
+
             // Create label
             this._qrLabel = new St.Label({
                 text: 'Waiting for clipboard boss...',
@@ -50,12 +65,25 @@ const QrIndicator =  GObject.registerClass(
                             // Text slice
                             let displayText = text.length > 50 ? text.substring(0, 50) + '...' : text;
                             this._qrLabel.set_text(displayText);
+
+                            // Queue
+                            this._drawingArea.queue_repaint();
                         } else {
                             this._qrLabel.set_text('Clipboard is empty(');
                         }
                     });
                 }
             });
+        }
+        // Draw QR code
+        _drawQR(area){
+            let cr = area.get_context();
+            let [width, height] = area.get_surface_size();
+            cr.setSourceRGB(1.0, 0.0, 0.0); 
+            cr.rectangle(10, 10, width - 20, height - 20);
+            cr.fill();
+            
+            cr.$dispose();
         }
     }
 );
