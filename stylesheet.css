@@ -1,0 +1,31 @@
+.qr-save-button {
+    background-color: rgba(255, 255, 255, 0.1); 
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 99px;
+    padding: 8px 24px;
+    margin-top: 15px;
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+
+.qr-save-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+
+.qr-save-button:active {
+    background-color: #3584e4; 
+    color: white;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(1px);
+}
+
+
+.qr-btn-box {
+    spacing: 8px;
+}

@@ -2,14 +2,20 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import Cairo from 'gi://cairo';
+import GLib from 'gi://GLib'; // নতুন যুক্ত করা হয়েছে
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
-//import qrcode engine
+
+// Clipboard setup
+const Clipboard = St.Clipboard.get_default();
+const CLIPBOARD_TYPE = St.ClipboardType.CLIPBOARD;
+
+// QR Code Engine (No changes needed here)
 var QRCode;
 (function () {
     function QR8bitByte(data) {
-        this.mode = 4; // 8bit Byte
+        this.mode = 4;
         this.data = data;
     }
     QR8bitByte.prototype = {
@@ -79,27 +85,6 @@ var QRCode;
                 }
             }
             return pattern;
-        },
-        createMovieClip: function (target_mc, instance_name, depth) {
-            var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
-            var cs = 1;
-            this.make();
-            for (var row = 0; row < this.modules.length; row++) {
-                var y = row * cs;
-                for (var col = 0; col < this.modules[row].length; col++) {
-                    var x = col * cs;
-                    var dark = this.modules[row][col];
-                    if (dark) {
-                        qr_mc.beginFill(0, 100);
-                        qr_mc.moveTo(x, y);
-                        qr_mc.lineTo(x + cs, y);
-                        qr_mc.lineTo(x + cs, y + cs);
-                        qr_mc.lineTo(x, y + cs);
-                        qr_mc.endFill();
-                    }
-                }
-            }
-            return qr_mc;
         },
         setupTimingPattern: function () {
             for (var r = 8; r < this.moduleCount - 8; r++) {
@@ -277,10 +262,8 @@ var QRCode;
     QRCode = QRCodeModel;
 })();
 
-const Clipboard = St.Clipboard.get_default();
-const CLIPBOARD_TYPE = St.ClipboardType.CLIPBOARD;
 
-//Class for Panel menu
+// Class for Panel menu
 const QrIndicator =  GObject.registerClass(
     class Qrindicator extends PanelMenu.Button {
         _init() {
@@ -324,6 +307,41 @@ const QrIndicator =  GObject.registerClass(
                 y_align: Clutter.ActorAlign.CENTER
             });
             box.add_child(this._qrLabel);
+
+            // save btn created
+            let saveBtn = new St.Button({
+                style_class: 'qr-save-button', // stylesheet.css থেকে স্টাইল নেবে
+                x_align: Clutter.ActorAlign.CENTER,
+                y_align: Clutter.ActorAlign.CENTER,
+                can_focus: true
+            });
+
+            let btnContent = new St.BoxLayout({
+                style_class: 'qr-btn-box',
+                vertical: false
+            });
+
+            let btnIcon = new St.Icon({
+                icon_name: 'document-save-symbolic', 
+                icon_size: 16,
+                style: 'color: white;'
+            });
+
+            let btnLabel = new St.Label({
+                text: 'Save QR Code',
+                y_align: Clutter.ActorAlign.CENTER
+            });
+
+            btnContent.add_child(btnIcon);
+            btnContent.add_child(btnLabel);
+            
+            saveBtn.set_child(btnContent);
+
+            saveBtn.connect('clicked', () => {
+                this._saveImage();
+            });
+            
+            box.add_child(saveBtn);
 
             this.menu.box.add_child(box);
 
@@ -443,8 +461,87 @@ const QrIndicator =  GObject.registerClass(
             }
             cr.$dispose();
         }
+
+        _saveImage() {
+            if (!this._qrText) {
+                Main.notify("Error", "No QR Code to save!");
+                return;
+            }
+    
+            try {
+                // Save loaction
+                let picturesDir = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES);
+                if (!picturesDir) picturesDir = GLib.get_home_dir(); 
+              
+                let filename = `qr_code_by_QRDrop${GLib.get_real_time()}.png`;
+                let path = `${picturesDir}/${filename}`;
+    
+                
+                let imgSize = 500;
+                let surface = new Cairo.ImageSurface(Cairo.Format.ARGB32, imgSize, imgSize);
+                let cr = new Cairo.Context(surface);
+    
+                
+                cr.setAntialias(Cairo.Antialias.NONE);
+                cr.setSourceRGB(1.0, 1.0, 1.0); 
+                cr.rectangle(0, 0, imgSize, imgSize);
+                cr.fill();
+    
+                let qr = null;
+                
+                for (let type = 1; type <= 40; type++) {
+                    try {
+                        let tempQR = new QRCode(type, 1); 
+                        tempQR.addData(this._qrText);
+                        tempQR.make();
+                        qr = tempQR;
+                        break;
+                    } catch (e) { continue; }
+                }
+    
+                if (qr) {
+                    let count = qr.getModuleCount();
+                    let padding = 20; 
+                    let availableSize = imgSize - (padding * 2);
+                    let scale = availableSize / count;
+                    
+                    let contentSize = scale * count;
+                    let startX = (imgSize - contentSize) / 2;
+                    let startY = (imgSize - contentSize) / 2;
+    
+                    cr.translate(startX, startY);
+                    cr.setSourceRGB(0.0, 0.0, 0.0);
+    
+                    for (let r = 0; r < count; r++) {
+                        for (let c = 0; c < count; c++) {
+                            if (qr.isDark(r, c)) {
+                                let x = c * scale;
+                                let y = r * scale;
+                                cr.rectangle(x, y, scale + 0.06, scale + 0.06);
+                            }
+                        }
+                    }
+                    cr.fill();
+                }
+    
+                // File write
+                surface.writeToPNG(path);
+                
+                // Memory clean
+                cr.$dispose();
+                surface.$dispose(); 
+    
+                //Notify users
+                Main.notify("QR Saved", `Saved to Pictures/${filename}`);
+    
+            } catch (e) {
+                global.logError(e);
+                Main.notify("Error", "Failed to save QR Code");
+            }
+        }
     }
 );
+
 // Main extension class
 export default class QrDropExtension extends Extension {
     enable(){
@@ -459,4 +556,3 @@ export default class QrDropExtension extends Extension {
         this._indicator = null;
     }
 }
-// QR code generation engine
