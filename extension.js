@@ -310,10 +310,12 @@ const QrIndicator =  GObject.registerClass(
 
             // save btn created
             let saveBtn = new St.Button({
-                style_class: 'qr-save-button', // stylesheet.css থেকে স্টাইল নেবে
+                style_class: 'qr-save-button',
                 x_align: Clutter.ActorAlign.CENTER,
                 y_align: Clutter.ActorAlign.CENTER,
-                can_focus: true
+                can_focus: true,
+                reactive: true,      
+                track_hover: true
             });
 
             let btnContent = new St.BoxLayout({
