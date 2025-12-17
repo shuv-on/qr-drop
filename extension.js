@@ -11,7 +11,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 const Clipboard = St.Clipboard.get_default();
 const CLIPBOARD_TYPE = St.ClipboardType.CLIPBOARD;
 
-// QR Code Engine (No changes needed here)
+// QR Code Engine
 var QRCode;
 (function () {
     function QR8bitByte(data) {
