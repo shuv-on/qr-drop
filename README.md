@@ -17,8 +17,8 @@ Follow these steps to install the extension manually from the source code.
 ### Step 1: Download the Source Code
 Open your terminal and clone the repository using git:
 ```bash
-git clone [https://github.com/shuv-on/qr-drop.git](https://github.com/shuv-on/qr-drop.git)
-
+git clone https://github.com/shuv-on/qr-drop.git
+```
 
 ### Step 2: Create the Extension Directory
 
