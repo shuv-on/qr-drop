@@ -21,20 +21,32 @@ git clone [https://github.com/shuv-on/qr-drop.git](https://github.com/shuv-on/qr
 
 ```
 ### Step 2: Create the Extension Directory
+
 We need to create a specific folder for this extension in your local GNOME directory. Run this command:
 ```bash
 mkdir -p ~/.local/share/gnome-shell/extensions/qrdrop@shuvon.com
 ```
 
 ### Step 3: Install the Files
+
 ```bash
 cp -r qr-drop/* ~/.local/share/gnome-shell/extensions/qrdrop@shuvon.com/
 ```
 
 ### Step 4: Restart GNOME Shell
+
 - For X11 Users: Press Alt + F2, type r, and hit Enter.
 - For Wayland Users: You must Log Out and Log In again (Restarting via command is not supported in Wayland).
 ### Step 5: Enable the Extension
 ```bash
 gnome-extensions enable qrdrop@shuvon.com
 ```
+Or, you can open the "Extensions" or "Extension Manager" app and toggle the switch for QR Drop.
+
+
+## Usage 🛠️
+
+1. Copy any text or link to your clipboard (`Ctrl+C`).
+2. Click the **QR Drop** icon (📱) in the top panel.
+3. The QR code will appear instantly.
+4. Click the **"Save QR Code"** button to save the image to your Pictures folder.
