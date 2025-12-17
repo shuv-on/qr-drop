@@ -19,7 +19,7 @@ Open your terminal and clone the repository using git:
 ```bash
 git clone [https://github.com/shuv-on/qr-drop.git](https://github.com/shuv-on/qr-drop.git)
 
-```
+
 ### Step 2: Create the Extension Directory
 
 We need to create a specific folder for this extension in your local GNOME directory. Run this command:
