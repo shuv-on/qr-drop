@@ -12,6 +12,11 @@ const Clipboard = St.Clipboard.get_default();
 const CLIPBOARD_TYPE = St.ClipboardType.CLIPBOARD;
 
 // QR Code Engine
+// ========================================================
+// EXTERNAL LIBRARY: QRCode.js
+// Source: https://github.com/davidshimjs/qrcodejs
+// License: MIT
+// ========================================================
 var QRCode;
 (function () {
     function QR8bitByte(data) {
@@ -261,6 +266,9 @@ var QRCode;
     };
     QRCode = QRCodeModel;
 })();
+// ========================================================
+// END OF EXTERNAL LIBRARY
+// ========================================================
 
 
 // Class for Panel menu
