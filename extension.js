@@ -1,9 +1,10 @@
+import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import Cairo from 'gi://cairo';
 import GLib from 'gi://GLib';
-import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
@@ -12,7 +13,7 @@ import QRCode from './qrcode.js';
 // Class for Panel menu
 const QrIndicator = GObject.registerClass(
     class QrIndicator extends PanelMenu.Button {
-        _init() {
+        _init(extensionPath) {
             // Call parent constructor; 0.0-> menu align, _(QR Drop)-> menu title
             super._init(0.0, _('QR Drop'));
 
@@ -21,8 +22,11 @@ const QrIndicator = GObject.registerClass(
             this._clipboardType = St.ClipboardType.CLIPBOARD;
 
             // Create icon
+            let iconPath = extensionPath + '/icons/qr-symbolic.svg';
+            let gicon = Gio.icon_new_for_string(iconPath);
+
             const icon = new St.Icon({
-                icon_name: 'smartphone-symbolic',
+                gicon: gicon, 
                 style_class: 'system-status-icon',
             });
 
@@ -224,7 +228,7 @@ const QrIndicator = GObject.registerClass(
                 let picturesDir = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES);
                 if (!picturesDir) picturesDir = GLib.get_home_dir();
 
-                let filename = `qr_code_by_QRDrop${GLib.get_real_time()}.png`;
+                let filename = `qr_code_by_QRDrop_${GLib.get_real_time()}.png`;
                 let path = `${picturesDir}/${filename}`;
 
 
@@ -297,7 +301,7 @@ const QrIndicator = GObject.registerClass(
 export default class QrDropExtension extends Extension {
     enable() {
         // If extension is enabled;
-        this._indicator = new QrIndicator();
+        this._indicator = new QrIndicator(this.path);
 
         // Add button to panel
         Main.panel.addToStatusArea(this.uuid, this._indicator);
