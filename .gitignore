@@ -4,3 +4,4 @@ node_modules/
 *.log
 schemas/gschemas.compiled
 *.zip
+*.txt
